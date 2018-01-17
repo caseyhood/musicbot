@@ -8,22 +8,23 @@ var bot = new Discord.Client();
 
 var play = function(connection, message) {
   var server = servers[message.guild.id];
-  const streamOptions = { seek: 0, volume: 1 };
-  // console.log(server.queue);
-  // server.dispatcher = connection.playStream(YTDL(server.queue[0], {filter: "audioonly"}));
-  const stream = ytdl('https://www.youtube.com/watch?v=XAWgeLF9EVQ', { filter : 'audioonly' });
-      const dispatcher = connection.playStream(stream, streamOptions);
-      console.log(dispatcher);
+  console.log(server.queue[0]);
+  // ?const streamOptions = { seek: 0, volume: 1 };
+  console.log(server.queue);
+  server.dispatcher = connection.playStream(ytdl(server.queue[0], {filter: "audioonly"}));
+  // const stream = ytdl('https://www.youtube.com/watch?v=XAWgeLF9EVQ', { filter : 'audioonly' });
+  //     const dispatcher = connection.playStream(stream, streamOptions);
+  //     console.log(stream);
   // console.log(server.dispatcher);
-  // server.queue.shift();
-  // server.dispatcher.on("end", function(){
-  //   if(server.queue[0]){
-  //     play(connection, message);
-  //   }
-  //   else {
-  //     connection.disconnect();
-  //   }
-  // })
+  server.queue.shift();
+  server.dispatcher.on("end", function(){
+    if(server.queue[0]){
+      play(connection, message);
+    }
+    else {
+      connection.disconnect();
+    }
+  })
   // return;
 }
 
@@ -62,7 +63,8 @@ bot.on("message", async function(message) {
         }
       }
       var server = servers[message.guild.id];
-      server.queue.push(args[2]);
+      server.queue.push(args[1]);
+      // console.log(server.queue);
 
       if(!message.guild.voiceConnection){
         message.member.voiceChannel.join().then(function(connection){
