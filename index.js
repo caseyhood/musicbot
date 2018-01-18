@@ -1,10 +1,18 @@
 const Discord = require("discord.js");
 const config = require("./config.json");
 const ytdl = require("ytdl-core");
+const yt = require('youtube-node');
 
 const token = config.TOKEN;
 const prefix = config.PREFIX;
 var bot = new Discord.Client();
+var youtube = new yt();
+
+youtube.setKey('AIzaSyB8VN6fqy86Pg90H4DfKJDHhNZcWNK-cXo');
+youtube.search('amber run',5,function(err, res){
+	if(err) console.log(err);
+	else console.log(JSON.stringify(res, null, 2));
+});
 
 var play = function(connection, message) {
 
