@@ -38,25 +38,35 @@ var autoplayer = function(server) {
 
 	});
 };
-
+var infos = [];
 var play = function(connection, message) {
 	var server = servers[message.guild.id];
-
-	if(autoplay){
-		// console.log(currentQ);
-		autoplayer(server);
+	if(server.queue){
+		ytdl.getInfo(server.queue[0], function(err, info){
+			if(err) throw err;
+			bot.user.setPresence({game:{name: info.title.toUpperCase(), type: 2}}).then(function(){console.log(info.title.toUpperCase());}).catch(function(err){throw err;});
+			message.channel.send("Now Playing... " + info.title.toUpperCase());
+			// infos.push(info.title.toUpperCase());
+			console.log(infos);
+		});
 
 	}
 
 
 
-  server.dispatcher = connection.playStream(ytdl(server.queue[0], {filter: "audioonly"}));
-	ytdl.getInfo(server.queue[0], function(err, info){
-		if(err) throw err;
-		bot.user.setPresence({game:{name: info.title.toUpperCase(), type: 2}}).then(function(){console.log(info.title.toUpperCase());}).catch(function(err){throw err;});
-		message.channel.send("Now playing " + info.title.toUpperCase())
 
-	});
+  server.dispatcher = connection.playStream(ytdl(server.queue[0], {filter: "audioonly"}));
+	// ytdl.getInfo(server.queue[0], function(err, info){
+	// 	if(err) throw err;
+	// 	bot.user.setPresence({game:{name: info.title.toUpperCase(), type: 2}}).then(function(){console.log(info.title.toUpperCase());}).catch(function(err){throw err;});
+	// 	message.channel.send("Queued... " + info.title.toUpperCase() + " " + server.queue[0]);
+  //
+	// });
+
+		if(autoplay){
+			// console.log(currentQ);
+			autoplayer(server);
+		}
 
 
   // const stream = ytdl('https://www.youtube.com/watch?v=XAWgeLF9EVQ', { filter : 'audioonly' });
@@ -73,6 +83,10 @@ var play = function(connection, message) {
       bot.user.setPresence({game:{name: 'NADA...', type: 2}}).then(function(){connection.disconnect();console.log("now stopped and disconnected");}).catch(function(err){throw err;});
     }
   })
+
+
+
+
   // return;
 }
 
@@ -168,11 +182,17 @@ bot.on("message", async function(message) {
 				break;
 		case "q":
 			var server = servers[message.guild.id];
+
 			if(!server) {
-				message.channel.send("Queue has " + server.queue.length + ' songs.');
+				message.channel.send("No songs are in the queue! Add one with " + prefix + "play.");
 			}
 			else {
 				message.channel.send("Queue has " + server.queue.length + ' songs.');
+
+				// for(i=0; i < server.queue.length; i++){
+        //
+				// 	message.channel.send(i+1 + " ." + infos);
+				// }
 
 			}
 			break;
